@@ -31,12 +31,19 @@ var artPlaces =  [
         }
         ];
 
-var ArtLocation = function(data){
+var map;
+var service;
+var infowindow;
 
+var ArtLocation = function(data){
+	/*
 	this.name = ko.observable(data.name);
 	this.position = ko.observable(data.position);
 	this.type = ko.observable(data.type);
-
+	*/
+	this.name = data.name;
+	this.position = data.position;
+	this.type = data.type;
 };
 var ViewModel = function() {
 	var self = this;
@@ -49,24 +56,55 @@ var ViewModel = function() {
 		self.artList.push(new ArtLocation(artPlaceItem));
 	});
 
-	console.log(this.artList()[0].position());
-	this.moveWindow = function() {
+	//console.log(map);
+
+	console.log(this.artList().length);
+	console.log(this.artList()[0].position);
+	console.log(this.artList()[0].type);
+	console.log(this.artList()[0].name);
+
+	/* this.currentCat = ko.observable(this.catList()[0]);
+	this.setCurrentCat = function(nextCat) {
+
+		self.currentCat(nextCat);
+
+	}; */
+
+	this.currentAttraction = ko.observable(this.artList()[0]);
+	console.log("Here");
+	console.log(this.currentAttraction().name);
+	// Update current attraction
+	this.setCurrentAttraction = function(nextAttraction){
+		console.log("Which Damm Attraction!");
+		self.currentAttraction(nextAttraction);
+		//reset the window content and position
+		infoWindow.setContent(self.currentAttraction().name);
+		infoWindow.setPosition(self.currentAttraction().position);
+	};
+
+	this.moveWindow = function(name) {
+
 		console.log("this is where I figure out where to put the window");
-		//infoWindow.setContent(artPlaces[iCopy].name);
+		//infoWindow.setContent(self.currentAttraction().name);
+
+		console.log(self.currentAttraction().name);
+		infoWindow.setPosition(self.currentAttraction().position);
 		//infoWindow.open(map, markerCopy);
 	};
 
+
 }
 
-var map;
-var service;
-var infowindow;
+
+
 function initMap() {
-    var philly = new google.maps.LatLng(39.9526, -75.1652);
+    //var philly = new google.maps.LatLng(39.9526, -75.1652);
+    var philly = {lat: 39.9526, lng: -75.1652};
     	map = new google.maps.Map(document.getElementById('map'), {
     		center: philly, //{lat: 39.9526, lng: -75.1652},			// Philadelphia PA
     		zoom: 14
     	});
+
     /*
     var request = {
     		location: philly,
@@ -76,16 +114,15 @@ function initMap() {
 	*/
   	//service = new google.maps.places.PlacesService(map);
   	//service.nearbySearch(request, callback);
+
   	//create infoWindow
   	infoWindow = new google.maps.InfoWindow({
-	      			content: "try this"
-	    		});
+	   });
+
+  	//This code works to set markers...
+
   	for (var i = 0; i < artPlaces.length; i++) {
-  			/*
-			var infoWindow = new google.maps.InfoWindow({
-	      			content: "model "+i
-	    		});
-	    	*/
+
 			var marker = new google.maps.Marker({
 	      			map: map,
 	      			position: artPlaces[i].position,
@@ -99,40 +136,10 @@ function initMap() {
 		      		 		infoWindow.open(map, markerCopy);
 		      			};
 		    })(marker, i));
-		}
+	}
+
 }
 
 ko.applyBindings(new ViewModel());
-/*
-function callback(results, status){
-	if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-		var markers = [];
-		var infoWindows = [];
-		//var i = 0;
-
-		for (var i = 0; i < results.length; i++) {
-
-			var infoWindow = new google.maps.InfoWindow({
-	      			content: "model "+i
-	    		});
-			var marker = new google.maps.Marker({
-	      			map: map,
-	      			position: results[i].geometry.location,
-	      			place: {
-	      			placeId: results[i].place_id,
-	      			location: results[i].geometry.location
-	      			}
-	      		});
-
-			marker.addListener('click', (function(markerCopy, infoWindowCopy) {
-				return function(){
-		      		 		infoWindowCopy.open(map, markerCopy);
-		      			};
-		    })(marker, infoWindow));
-		}
-
-    }
-
-} */
 
