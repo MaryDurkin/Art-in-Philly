@@ -18,6 +18,10 @@
     <div>
         <h1>Let's get started</h1>
         <h2 data-bind="text: location"></h2>
+        <ul data-bind="foreach: artList">
+        <li><button data-bind="click: $parent.moveWindow, text: name"></button></li>
+
+    </ul>
     </div>
      <style>
       html, body {
