@@ -38,7 +38,25 @@ var ArtLocation = function(data){
 	this.type = ko.observable(data.type);
 
 };
+var ViewModel = function() {
+	var self = this;
+	this.location = ko.observable("Haverford");
 
+	this.artList = ko.observableArray([]);
+
+	artPlaces.forEach(function(artPlaceItem){
+
+		self.artList.push(new ArtLocation(artPlaceItem));
+	});
+
+	console.log(this.artList()[0].position());
+	this.moveWindow = function() {
+		console.log("this is where I figure out where to put the window");
+		//infoWindow.setContent(artPlaces[iCopy].name);
+		//infoWindow.open(map, markerCopy);
+	};
+
+}
 
 var map;
 var service;
@@ -49,16 +67,17 @@ function initMap() {
     		center: philly, //{lat: 39.9526, lng: -75.1652},			// Philadelphia PA
     		zoom: 14
     	});
+    /*
     var request = {
     		location: philly,
     		radius: '2500',
     		types: ['museum','art_gallery','store']
   		};
-
-  	service = new google.maps.places.PlacesService(map);
+	*/
+  	//service = new google.maps.places.PlacesService(map);
   	//service.nearbySearch(request, callback);
   	//create infoWindow
-  	var infoWindow = new google.maps.InfoWindow({
+  	infoWindow = new google.maps.InfoWindow({
 	      			content: "try this"
 	    		});
   	for (var i = 0; i < artPlaces.length; i++) {
@@ -82,24 +101,7 @@ function initMap() {
 		    })(marker, i));
 		}
 }
-var ViewModel = function() {
-	var self = this;
-	this.location = ko.observable("Haverford");
 
-	this.artList = ko.observableArray([]);
-
-	artPlaces.forEach(function(artPlaceItem){
-
-		self.artList.push(new ArtLocation(artPlaceItem));
-	});
-	console.log(artPlaces);
-	this.moveWindow = function() {
-		console.log("this is where I figure out where to put the window");
-		//infoWindow.setContent(artPlaces[iCopy].name);
-		//infoWindow.open(map, markerCopy);
-	};
-
-}
 ko.applyBindings(new ViewModel());
 /*
 function callback(results, status){
