@@ -17,7 +17,7 @@
 <body>
     <div>
         <h1>Let's get started</h1>
-        <h2 data-bind="text: location"></h2>
+
         <ul data-bind="foreach: artList">
         <li><button data-bind="click: $parent.setCurrentAttraction, text: name"></button></li>
 
@@ -36,16 +36,7 @@
 
 
     <div id="map"></div>
-<!--    <script>
-      var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 39.9526, lng: -75.1652},
-          zoom: 12
-        });
-      }
-    </script>
--->
+
       <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo&callback=initMap"
     async defer></script>
     <script src="js/lib/knockout-3.4.0.js"></script>
