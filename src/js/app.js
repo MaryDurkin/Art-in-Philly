@@ -35,7 +35,7 @@ var map;
 var infowindow;
 var locationMarkers = [];
 var marker;
-
+var placeTypes = ['All','Gallery','Museum','Supply Store'];
 function initMap() {
 
     // create map
@@ -76,12 +76,14 @@ function initMap() {
 
 var ViewModel = function() {
 	var self = this;
+	chosenType =  ko.observable("All");
 	var ArtLocation = function(data){
 
+		this.selected = ko.observable(true);
 		this.name = data.name;
 		this.position = data.position;
 		this.type = data.type;
-		this.marker = data.marker;
+
 	};
 	this.artList = ko.observableArray([]);
 
@@ -96,10 +98,46 @@ var ViewModel = function() {
 	//console.log(this.currentAttraction().name);
 	console.log(locationMarkers);
 
+	this.updateVisibles = function() {
+
+		type = chosenType();
+		console.log(self.artList());
+		console.log(artPlaces);
+		console.log("running!");
+		console.log("Type: " + type);
+		if (type == 'All') {
+			for (var i = 0; i < artPlaces.length; i++) {
+				self.artList()[i].selected(true);
+
+				artPlaces[i].marker.setVisible(true);
+			}
+		}
+		else {
+			for (var i = 0; i< artPlaces.length; i++){
+				console.log(i);
+				//console.log(self.artList()[i].type);
+				 if (type === self.artList()[i].type){
+				 	self.artList()[i].selected(true);
+				 	artPlaces[i].marker.setVisible(true);
+				 	console.log(true);
+				 }
+				 else {
+				 	self.artList()[i].selected(false);
+				 	artPlaces[i].marker.setVisible(false);
+				 	console.log(false);
+				 }
+			}
+		}
+		console.log(chosenType());
+
+
+	};
+
 	// Update current attraction
 	this.setCurrentAttraction = function(nextAttraction){
 
 		self.currentAttraction(nextAttraction);
+
 		//reset the window content and position
 		infoWindow.setContent(self.currentAttraction().name);
 		infoWindow.setPosition(self.currentAttraction().position);

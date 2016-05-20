@@ -16,12 +16,12 @@
 </head>
 <body>
     <div>
-        <h1>Let's get started</h1>
+      <h1>Let's get started</h1>
+      <select data-bind = "options: placeTypes, click: $data.updateVisibles, value: chosenType"></select>
+      <ul data-bind="foreach: artList">
+        <li><button data-bind="visible: selected, click: $parent.setCurrentAttraction, text: name"></button></li>
 
-        <ul data-bind="foreach: artList">
-        <li><button data-bind="click: $parent.setCurrentAttraction, text: name"></button></li>
-
-    </ul>
+      </ul>
     </div>
      <style>
       html, body {
