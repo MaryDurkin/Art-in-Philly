@@ -1,3 +1,10 @@
+/*
+There are three basic data structures that the app uses:
+	the initial one provided - artPlaces
+	an array of map markers for each of these places - locationMarkers[]
+	a KO array created from artPlaces
+	there is also currentIndex variable that is used to make sure the correct marker is referenced
+*/
 var artPlaces =  [
         {
             name: "Philadelphia Museum of Art",
@@ -29,7 +36,7 @@ var artPlaces =  [
             position: {lat: 39.942642, lng: -75.1592851},
             type: 'Gallery'
         },
-        {
+        {	// used to test, for example, if a location closes and foursquare no longer holds data
             name: "Test Error Location",
             position: {lat: 39.953248, lng: -75.162},
             type: 'Gallery'
@@ -43,6 +50,7 @@ var marker;
 // used for the data bind menu
 var placeTypes = ['All','Gallery','Museum','Supply Store'];
 
+// constructor for element of KO array artList
 var ArtLocation = function(data){
 	this.selected = ko.observable(true);
 	this.name = data.name;
@@ -82,9 +90,10 @@ var ViewModel = function() {
 	chosenType =  ko.observable("All");
 	var currentMarker;
 	var currentIndex = 0;
-	var lastIndex = 0;
+	//var lastIndex = 0;
 	this.artList = ko.observableArray([]);
 
+	// setWindow gets the info from foursquare and updates the content of the infowindow
 	var setWindow = function(place,index) {
 
 		var CLIENT_ID = "NB2NRF1KT2Q2ZXV2XLNWX5OFP2MCBZN4ZSUHGCTA2UTEPX0I";
@@ -110,6 +119,7 @@ var ViewModel = function() {
 
 	};
 
+	//populate KO list of places
 	artPlaces.forEach(function(artPlaceItem){
 
 		self.artList.push(new ArtLocation(artPlaceItem));
@@ -131,10 +141,11 @@ var ViewModel = function() {
 		})(currentMarker, i));
 	}
 
-
+	// initial value
 	this.currentAttraction = ko.observable(this.artList()[0]);
 
-
+	// updateVisibles is bound to the drop down menu and toggles the visibility of each
+	// item based on the menu selection
 	this.updateVisibles = function() {
 
 		var type = chosenType();
@@ -161,7 +172,7 @@ var ViewModel = function() {
 		}
 	};
 
-	function findIndex(name) {
+	function findIndex(name) { //returns array index of currentAttraction
 
 		for (var i=0; i < artPlaces.length; i++ ) {
 			if (name === artPlaces[i].name) {
@@ -181,7 +192,7 @@ var ViewModel = function() {
 
 
 
-	// Update current attraction
+	// bound to listed attractions
 	this.setCurrentAttraction = function(nextAttraction){
 		//lastIndex = currentIndex;
 		self.currentAttraction(nextAttraction);
