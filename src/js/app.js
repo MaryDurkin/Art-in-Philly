@@ -2,50 +2,37 @@ var artPlaces =  [
         {
             name: "Philadelphia Museum of Art",
             position: {lat: 39.9658015, lng: -75.1811616},
-            type: 'Museum',
-            address: "",
-            crossStreet: "",
-            phone: ""
+            type: 'Museum'
         },
         {
             name: "The Barnes Foundation",
             position: {lat: 39.9605194, lng: -75.1725901},
-            type: 'Museum',
-            address: "",
-            crossStreet: "",
-            phone: ""
+            type: 'Museum'
         },
         {
             name: "Rodin Museum",
             position: {lat: 39.9619653, lng: -75.1739912},
-            type: 'Museum',
-            address: "",
-            crossStreet: "",
-            phone: ""
+            type: 'Museum'
         },
         {
    			name: "Pennsylvania Academy of The Fine Arts",
             position: {lat: 39.9556041, lng: -75.1632326},
-            type: 'Museum',
-            address: "",
-            crossStreet: "",
-            phone: ""
+            type: 'Museum'
         },
         {
             name: "Blick Art Materials",
             position: {lat: 39.9506031, lng: -75.1631014},
-            type: 'Supply Store',
-            address: "",
-            crossStreet: "",
-            phone: ""
+            type: 'Supply Store'
         },
         {
             name: "Philadelphia's Magic Gardens",
             position: {lat: 39.942642, lng: -75.1592851},
-            type: 'Gallery',
-            address: "",
-            crossStreet: "",
-            phone: ""
+            type: 'Gallery'
+        },
+        {
+            name: "Test Error Location",
+            position: {lat: 39.953248, lng: -75.162},
+            type: 'Gallery'
         }
         ];
 
@@ -53,6 +40,7 @@ var map;
 var infoWindow;
 var locationMarkers = [];
 var marker;
+// used for the data bind menu
 var placeTypes = ['All','Gallery','Museum','Supply Store'];
 
 var ArtLocation = function(data){
@@ -68,7 +56,7 @@ function initMap() {
     // create map
     var PHILLY = {lat: 39.9526, lng: -75.1652};
     map = new google.maps.Map(document.getElementById('map'), {
-    	center: PHILLY, //{lat: 39.9526, lng: -75.1652},			// Philadelphia PA
+    	center: PHILLY,
     	zoom: 14
     });
 
@@ -77,17 +65,13 @@ function initMap() {
 	   });
   	// create markers...
   	for (var i = 0; i < artPlaces.length; i++) {
-
 			marker = new google.maps.Marker({
 	      			map: map,
 	      			position: artPlaces[i].position,
 	      			label: artPlaces[i].type
 	      		});
-
 		    // add marker to array of loaction markers
 			locationMarkers[i] = marker;
-			artPlaces[i].marker = marker;
-
 	}
 	ko.applyBindings(new ViewModel());
 }
@@ -97,22 +81,32 @@ var ViewModel = function() {
 	var self = this;
 	chosenType =  ko.observable("All");
 	var currentMarker;
+	var currentIndex = 0;
+	var lastIndex = 0;
 	this.artList = ko.observableArray([]);
 
-	var getFourSquareInfo = function(place,position) {
+	var setWindow = function(place,index) {
 
-	var CLIENT_ID = "NB2NRF1KT2Q2ZXV2XLNWX5OFP2MCBZN4ZSUHGCTA2UTEPX0I";
-	var CLIENT_SECRET = "WZDS21MLCN3ETHUVXOZSZPFA13T2LJFEU2P0WWQYXCBCA2KI";
-	var FourSquareURL = "https://api.foursquare.com/v2/venues/search?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&v=20130815&ll=39.9526,-75.1652&query=" + place + "&match&limit=1";
-	var windowData;
-		$.getJSON(FourSquareURL, function(data) {
+		var CLIENT_ID = "NB2NRF1KT2Q2ZXV2XLNWX5OFP2MCBZN4ZSUHGCTA2UTEPX0I";
+		var CLIENT_SECRET = "WZDS21MLCN3ETHUVXOZSZPFA13T2LJFEU2P0WWQYXCBCA2KI";
+		var FourSquareURL = "https://api.foursquare.com/v2/venues/search?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&v=20130815&ll=39.9526,-75.1652&query=" + place + "&match&limit=1";
 
-			windowData = data;
-			infoWindow.setContent(place + " "+data.response.venues[0].location.address + " " +data.response.venues[0].contact.formattedPhone);
-			infoWindow.setPosition(position);
-			infoWindow.open(map);
+			$.getJSON(FourSquareURL, function(data) {
 
-		});
+				if (data.response.venues.length >0) {
+					infoWindow.setContent(place + " "+data.response.venues[0].location.address + " " +data.response.venues[0].contact.formattedPhone);
+					infoWindow.open(map,locationMarkers[index]);
+				}
+				//This is used in the event of the .getJSON working but foursquare not having information on that location
+				else {
+					infoWindow.setContent(place + " further information not available");
+					infoWindow.open(map,locationMarkers[index]);
+				}
+
+			}).fail(function(e){ // regular error handling
+				infoWindow.setContent(place + "  further information not available");
+				infoWindow.open(map,locationMarkers[index]);
+			});
 
 	};
 
@@ -121,16 +115,22 @@ var ViewModel = function() {
 		self.artList.push(new ArtLocation(artPlaceItem));
 	});
 
+
+
 	// add event listeners to the markers
-	for (var i = 0; i < artPlaces.length; i++) {
-		currentMarker = artPlaces[i].marker;
+	for (var i = 0; i < locationMarkers.length; i++) {
+		currentMarker = locationMarkers[i];
+
 		currentMarker.addListener('click', (function(currentMarkerCopy, iCopy) {
+
 			return function(){
-				getFourSquareInfo(artPlaces[iCopy].name,artPlaces[iCopy].position);
+				setMarkerBounce(currentMarkerCopy);
+				setWindow(artPlaces[iCopy].name,iCopy);
+
 		    };
 		})(currentMarker, i));
-	};
-	//getFourSquareInfo();
+	}
+
 
 	this.currentAttraction = ko.observable(this.artList()[0]);
 
@@ -144,35 +144,52 @@ var ViewModel = function() {
 		if (type === 'All') {
 			for (var i = 0; i < artPlaces.length; i++) {
 				self.artList()[i].selected(true);
-
-				artPlaces[i].marker.setVisible(true);
+				locationMarkers[i].setVisible(true);
 			}
 		}
 		else {
 			for (var i = 0; i< artPlaces.length; i++){
-
-
 				 if (type === self.artList()[i].type) {
 				 	self.artList()[i].selected(true);
-				 	artPlaces[i].marker.setVisible(true);
-
+				 	locationMarkers[i].setVisible(true);
 				 }
 				 else {
 				 	self.artList()[i].selected(false);
-				 	artPlaces[i].marker.setVisible(false);
-
+				 	locationMarkers[i].setVisible(false);
 				 }
 			}
 		}
-
 	};
+
+	function findIndex(name) {
+
+		for (var i=0; i < artPlaces.length; i++ ) {
+			if (name === artPlaces[i].name) {
+				return i;
+			}
+		}
+		return -1;
+	};
+
+	function setMarkerBounce(marker) {
+
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(function () {
+        marker.setAnimation(null);
+    }, 2000);
+    };
+
+
 
 	// Update current attraction
 	this.setCurrentAttraction = function(nextAttraction){
+		//lastIndex = currentIndex;
 		self.currentAttraction(nextAttraction);
-		getFourSquareInfo(self.currentAttraction().name, self.currentAttraction().position);
 
+		currentIndex = findIndex(self.currentAttraction().name)
+		setMarkerBounce(locationMarkers[currentIndex]);
+		setWindow(self.currentAttraction().name, currentIndex);
 	};
 
-}
+};
 
