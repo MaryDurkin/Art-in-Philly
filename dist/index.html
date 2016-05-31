@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Neighborhood</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+</head>
+<body>
+    <div>
+      <h1>Let's get started</h1>
+      <select data-bind = "options: placeTypes,  click: $data.updateVisibles, value: chosenType"></select>
+      <ul data-bind="foreach: artList">
+        <li><button data-bind="visible: selected, click: $parent.setCurrentAttraction, text: name"></button></li>
+
+      </ul>
+    </div>
+     <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+
+
+    <div id="map"></div>
+
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo&callback=initMap"
+    async defer></script>
+    <script src="js/lib/knockout-3.4.0.js"></script>
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
+
+<!-- AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo -->
