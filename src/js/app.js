@@ -1,7 +1,6 @@
 /*
 There are two basic data structures that the app uses:
 	the initial one provided - artPlaces
-
 	a KO array created from artPlaces, with map markers added
 */
 var artPlaces =  [
@@ -64,6 +63,9 @@ var ViewModel = function() {
 	var infoWindow;
 	var currentAttraction;
 	var marker;
+	var text;
+	query =  "";
+
 	// constructor for element of KO array artList
 	var ArtLocation = function(data){
 		this.selected = ko.observable(true);
@@ -73,8 +75,6 @@ var ViewModel = function() {
 		this.marker = data.marker;
 
 	};
-
-	chosenType =  ko.observable("All");
 
 	// An observable array to store locations, their data and markers
 	artList = ko.observableArray([]);
@@ -100,15 +100,14 @@ var ViewModel = function() {
 
 			marker.addListener('click', (function(markerCopy, iCopy) {
 				return function(){
+					currentAttraction = artList()[iCopy];
 					setMarkerBounce(markerCopy);
-					setWindow(artList()[iCopy]);
+					setWindow(currentAttraction);
 		    	};
 			})(marker, i));
 	};
-
-
 	// initial value
-	currentAttraction = artList()[0];
+	//currentAttraction = artList()[0];
 	// setWindow gets the info from foursquare and updates the content of the infowindow
 	var setWindow = function(attraction) {
 
@@ -135,40 +134,31 @@ var ViewModel = function() {
 
 	};
 
-	// updateVisibles is bound to the drop down menu and toggles the visibility of each
-	// item based on the menu selection
-	this.updateVisibles = function() {
+	// this.filter is bound to the search box and sets the visibility of each
+	// location if it matches the search criteria
+	this.filter = function() {
 
-		var type = chosenType();
-
-		// close info window when new filter is chosen
+		//console.log("searching for matches of.."+string);
 		infoWindow.close();
-		if (type === 'All') {
-			for (var i = 0; i < artPlaces.length; i++) {
+		var lowerCaseQuery = query.toLowerCase();
+
+		for (var i=0; i < artList().length; i++) {
+			if (artList()[i].name.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
 				artList()[i].selected(true);
 				artList()[i].marker.setVisible(true);
 			}
-		}
-		else {
-			for (var i = 0; i< artPlaces.length; i++){
-				 if (type === artList()[i].type) {
-				 	artList()[i].selected(true);
-				 	artList()[i].marker.setVisible(true);
-				 }
-				 else {
-				 	artList()[i].selected(false);
-				 	artList()[i].marker.setVisible(false);
-				 }
+			else {
+				artList()[i].selected(false);
+				artList()[i].marker.setVisible(false);
 			}
-		}
+		};
 	};
-
 
 	function setMarkerBounce(marker) {
         marker.setAnimation(google.maps.Animation.BOUNCE);
           setTimeout(function () {
-        marker.setAnimation(null);
-    }, 2000);
+        	marker.setAnimation(null);
+    	}, 2000);
     };
 
 	// bound to listed attractions
