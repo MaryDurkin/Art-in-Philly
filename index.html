@@ -17,8 +17,9 @@
 <body>
     <div>
       <h1>Let's get started</h1>
-      <select data-bind = "options: placeTypes,  click: $data.updateVisibles, value: chosenType"></select>
-      <ul data-bind="foreach: artList">
+<!--      <select data-bind = "options: placeTypes,  click: $data.updateVisibles, value: chosenType"></select> -->
+        <input placeholder="Search…" type="search" data-bind="textInput: query, event: {keyup: $data.filter}" >
+        <ul data-bind="foreach: artList">
         <li data-bind="visible: selected, click: $parent.setCurrentAttraction, text: name"></li>
 
       </ul>
