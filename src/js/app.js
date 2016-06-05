@@ -33,26 +33,75 @@ var artPlaces =  [
             name: "Philadelphia's Magic Gardens",
             position: {lat: 39.942642, lng: -75.1592851},
             type: 'Gallery'
-        },
-        {	// used to test, for example, if a location closes and foursquare no longer holds data
-            name: "Test Error Location",
-            position: {lat: 39.953248, lng: -75.162},
-            type: 'Gallery'
         }
         ];
 
 var map;
-// used for the data bind menu
+// used for the data bind menu and possible later in the apps future for a 'select by type' menu option
 var placeTypes = ['All','Gallery','Museum','Supply Store'];
 
 function initMap() {
 
+// This JSON generated using the Google Maps style wizard:
+// http://googlemaps.github.io/js-samples/styledmaps/wizard/index.html
+	var styles = [
+	  {
+	    "featureType": "water",
+	    "stylers": [
+	      { "color": "#92a8d1" }
+	    ]
+	  },{
+	    "featureType": "poi.park",
+	    "stylers": [
+	      { "lightness": 29 },
+	      { "saturation": -12 },
+	      { "hue": "#00ff77" }
+	    ]
+	  },{
+	    "featureType": "landscape.man_made",
+	    "stylers": [
+	      { "hue": "#ffbb00" },
+	      { "saturation": 17 },
+	      { "lightness": -8 }
+	    ]
+	  },{
+	    "featureType": "transit.line",
+	    "stylers": [
+	      { "color": "#9896a4" }
+	    ]
+	  },{
+	    "featureType": "transit.station",
+	    "stylers": [
+	      { "color": "#9896a4" }
+	    ]
+	  },{
+	    "featureType": "poi.school",
+	    "stylers": [
+	      { "color": "#b18f6a" }
+	    ]
+	  },{
+	    "featureType": "road.arterial",
+	    "stylers": [
+	      { "saturation": -22 }
+	    ]
+	  }
+	];
+
+	var styledMap = new google.maps.StyledMapType(styles, {name: "Styled Map"});
     // create map
     var PHILLY = {lat: 39.9526, lng: -75.1652};
-    map = new google.maps.Map(document.getElementById('map'), {
+    var mapOptions = {
     	center: PHILLY,
-    	zoom: 14
-    });
+    	zoom: 14,
+    	mapTypeControl: false,
+    	mapTypeControlOptions: {
+    		mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+    	}
+    };
+   	map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    map.mapTypes.set('map_style', styledMap);
+  	map.setMapTypeId('map_style');
+
 
 	ko.applyBindings(new ViewModel());
 }
@@ -106,29 +155,47 @@ var ViewModel = function() {
 		    	};
 			})(marker, i));
 	};
-	// initial value
-	//currentAttraction = artList()[0];
-	// setWindow gets the info from foursquare and updates the content of the infowindow
-	var setWindow = function(attraction) {
 
+
+	// setWindow gets the info from foursquare and updates the content of the infowindow
 		var CLIENT_ID = "NB2NRF1KT2Q2ZXV2XLNWX5OFP2MCBZN4ZSUHGCTA2UTEPX0I";
 		var CLIENT_SECRET = "WZDS21MLCN3ETHUVXOZSZPFA13T2LJFEU2P0WWQYXCBCA2KI";
-		var FourSquareURL = "https://api.foursquare.com/v2/venues/search?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&v=20130815&ll=39.9526,-75.1652&query=" + attraction.name + "&match&limit=1";
+		var contentString;
 
+	var setWindow = function(attraction) {
+
+			var FourSquareURL = "https://api.foursquare.com/v2/venues/search?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&v=20130815&ll=39.9526,-75.1652&query=" + attraction.name + "&match&limit=1";
 			$.getJSON(FourSquareURL, function(data) {
 
 				if (data.response.venues.length >0) {
-					infoWindow.setContent(attraction.name + " "+data.response.venues[0].location.address + " " +data.response.venues[0].contact.formattedPhone);
+					//if the venue is found, populate the info window
+					contentString = '<div id="window-content">'+
+									'<h4 id="name">'+attraction.name+'</h4>'+
+									'<h5 id="address">'+data.response.venues[0].location.address+'</h5>'+
+									'<h5 id="phone">'+data.response.venues[0].contact.formattedPhone+'</h5>'+
+									'<h6 id="attribution">(Information provided by FourSquare)</h6>'+
+									'</div>';
+
+					infoWindow.setContent(contentString);
 					infoWindow.open(map,attraction.marker);
 				}
-				//This is used in the event of the .getJSON working but foursquare not having information on that location
+
 				else {
-					infoWindow.setContent(attraction.name + " further information not available");
+					// If the venue is not found, but the getJSON doesn't fail - populate teh info window with error message
+					contentString = '<div id="window-content">'+
+									'<h4 id="name">'+attraction.name+'</h4>'+
+									'<h6 id="error-msg">Further information not available</h6>'+
+									'</div>';
+					infoWindow.setContent(contentString);
 					infoWindow.open(map,attraction.marker);
 				}
 
 			}).fail(function(e){ // regular error handling
-				infoWindow.setContent(attraction + "  further information not available");
+				contentString = '<div id="window-content">'+
+								'<h4 id="name">'+attraction.name+'</h4>'+
+								'<h6 id="attribution">Further information not available</h6>'+
+								'</div>';
+				infoWindow.setContent(contentString);
 				infoWindow.open(map,attraction.marker);
 			});
 
@@ -138,7 +205,7 @@ var ViewModel = function() {
 	// location if it matches the search criteria
 	this.filter = function() {
 
-		//console.log("searching for matches of.."+string);
+
 		infoWindow.close();
 		var lowerCaseQuery = query.toLowerCase();
 
@@ -161,7 +228,7 @@ var ViewModel = function() {
     	}, 2000);
     };
 
-	// bound to listed attractions
+	// bound to listed attractions/places/venues
 	this.setCurrentAttraction = function(nextAttraction){
 		currentAttraction = nextAttraction;
 		setMarkerBounce(currentAttraction.marker);

@@ -2,49 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Neighborhood</title>
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-      }
-    </style>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Philly Art Scene</title>
+    <link href='https://fonts.googleapis.com/css?family=Karla:400,700italic,700,400italic' rel='stylesheet' type='text/css'>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
 <body>
-    <div>
-      <h1>Let's get started</h1>
-<!--      <select data-bind = "options: placeTypes,  click: $data.updateVisibles, value: chosenType"></select> -->
-        <input placeholder="Search…" type="search" data-bind="textInput: query, event: {keyup: $data.filter}" >
-        <ul data-bind="foreach: artList">
-        <li data-bind="visible: selected, click: $parent.setCurrentAttraction, text: name"></li>
+
+
+    <ul class="navigation">
+      <input class="search" placeholder="Search…" type="search" data-bind="textInput: query, event: {keyup: $data.filter}" >
+      <ul data-bind="foreach: artList">
+        <li class="art-place" data-bind="visible: selected, click: $parent.setCurrentAttraction, text: name"></li>
 
       </ul>
-    </div>
-     <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-      }
-    </style>
+    </ul>
+    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+    <label for="nav-trigger"></label>
+
+  <div class ="site-wrap" id="map">
+  </div>
 
 
-    <div id="map"></div>
-
-
-    <script src="js/lib/knockout-3.4.0.js"></script>
-    <script src="js/lib/jquery.min.js"></script>
-    <script src="js/app.js"></script>
-   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo&callback=initMap"
+  <script src="js/lib/knockout-3.4.0.js"></script>
+  <script src="js/lib/jquery.min.js"></script>
+  <script src="js/lib/bootstrap.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo&callback=initMap"
     async defer></script>
 </body>
 </html>
 
-<!-- AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo -->
