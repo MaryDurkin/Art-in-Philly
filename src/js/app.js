@@ -154,7 +154,7 @@ var ViewModel = function() {
 					setWindow(currentAttraction);
 		    	};
 			})(marker, i));
-	};
+	}
 
 
 	// setWindow gets the info from foursquare and updates the content of the infowindow
@@ -165,19 +165,24 @@ var ViewModel = function() {
 	var setWindow = function(attraction) {
 
 			var FourSquareURL = "https://api.foursquare.com/v2/venues/search?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&v=20130815&ll=39.9526,-75.1652&query=" + attraction.name + "&match&limit=1";
-			$.getJSON(FourSquareURL, function(data) {
-
+			var attributionURL = "http://foursquare.com/v/";
+			$.getJSON(FourSquareURL, function(data) {})
+				.done(function(data){
 				if (data.response.venues.length >0) {
 					//if the venue is found, populate the info window
+					attributionURL = "http://foursquare.com/v/"+data.response.venues[0].id;
 					contentString = '<div id="window-content">'+
 									'<h4 id="name">'+attraction.name+'</h4>'+
 									'<h5 id="address">'+data.response.venues[0].location.address+'</h5>'+
 									'<h5 id="phone">'+data.response.venues[0].contact.formattedPhone+'</h5>'+
-									'<h6 id="attribution">(Information provided by FourSquare)</h6>'+
+									'<h6 id="attribution">(Information provided by <a href="" id="four-square-return" target="_blank">FourSquare</a> )</h6>'+
+									//'<a href="" id="four-square-return" target="_blank">Read More</a>'+
 									'</div>';
 
 					infoWindow.setContent(contentString);
 					infoWindow.open(map,attraction.marker);
+					document.getElementById("four-square-return").href = attributionURL;
+
 				}
 
 				else {
@@ -190,14 +195,15 @@ var ViewModel = function() {
 					infoWindow.open(map,attraction.marker);
 				}
 
-			}).fail(function(e){ // regular error handling
+				})
+				.fail(function(e){ // regular error handling
 				contentString = '<div id="window-content">'+
 								'<h4 id="name">'+attraction.name+'</h4>'+
 								'<h6 id="attribution">Further information not available</h6>'+
 								'</div>';
 				infoWindow.setContent(contentString);
 				infoWindow.open(map,attraction.marker);
-			});
+				});
 
 	};
 
@@ -218,7 +224,7 @@ var ViewModel = function() {
 				artList()[i].selected(false);
 				artList()[i].marker.setVisible(false);
 			}
-		};
+		}
 	};
 
 	function setMarkerBounce(marker) {
@@ -226,7 +232,7 @@ var ViewModel = function() {
           setTimeout(function () {
         	marker.setAnimation(null);
     	}, 2000);
-    };
+    }
 
 	// bound to listed attractions/places/venues
 	this.setCurrentAttraction = function(nextAttraction){
