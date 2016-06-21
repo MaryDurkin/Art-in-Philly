@@ -14,7 +14,7 @@
 
 
     <div class="navigation">
-      <input class="search" placeholder="Search…" type="search" data-bind="textInput: query, event: {keyup: $data.filter}" >
+      <input class="search" placeholder="Search…" type="search" data-bind="textInput: $root.query, event: {keyup: $data.filter}" >
       <ul data-bind="foreach: artList">
         <li class="art-place" data-bind="visible: selected, click: $parent.setCurrentAttraction, text: name"></li>
 
@@ -23,7 +23,7 @@
     <input type="checkbox" id="nav-trigger" class="nav-trigger" />
     <label for="nav-trigger"></label>
 
-  <div class ="site-wrap" id="map">
+  <div class ="site-wrap my-map" id="map">
   </div>
 
 
