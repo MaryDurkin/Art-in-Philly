@@ -31,8 +31,12 @@
   <script src="js/lib/jquery.min.js"></script>
   <script src="js/lib/bootstrap.min.js"></script>
   <script src="js/app.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo&callback=initMap"
-    async defer></script>
+  <script>
+    var googleError = function() {
+        alert("Oops! something went wrong, check your internet connection.");
+    };
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUwMQveLt12CoFc0gen857OeUwU45vHTo&callback=initMap" onerror="googleError()"></script>
 </body>
 </html>
 
